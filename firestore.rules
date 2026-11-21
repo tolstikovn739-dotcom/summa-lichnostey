@@ -47,12 +47,87 @@ service cloud.firestore {
         && request.resource.data.img.matches('^data:image/(jpeg|png|webp);base64,.*');
       allow delete: if false;
     }
+    // A stale client must not erase prizes earned on another phone. Changing the
+    // claw aggregate requires the new immutable receipt in the same commit.
+    function preserveClaw(uid) {
+      let path = /databases/$(database)/documents/users/$(uid);
+      let before = exists(path) ? get(path).data.get('shop',{}).get('claw',{}) : {};
+      let after = request.resource.data.get('shop',{}).get('claw',{});
+      let id = after.get('last','');
+      return before == after || (id is string && id.matches('^[A-Za-z0-9_-]{1,64}$')
+        && !exists(/databases/$(database)/documents/users/$(uid)/clawRuns/$(id))
+        && existsAfter(/databases/$(database)/documents/users/$(uid)/clawRuns/$(id)));
+    }
     // Аккаунт по номеру и паролю: профиль, Σ, покупки, карточки. Читать и менять может только сам владелец.
     match /users/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['profile', 'st', 'shop', 'cards', 'eggs', 'v', 'updatedAt', 'assetOp']);
+        && request.resource.data.keys().hasOnly(['profile', 'st', 'shop', 'cards', 'eggs', 'v', 'updatedAt', 'assetOp'])
+        && preserveClaw(uid);
       allow delete: if false;
+    }
+    // «Хватайка» opens after Night Club. Each immutable receipt and its assets are
+    // committed together. A retry reads the same receipt instead of paying again.
+    match /users/{uid}/clawRuns/{runId} {
+      function entry() { return request.resource.data; }
+      function oldAccount() { return get(/databases/$(database)/documents/users/$(uid)).data; }
+      function newAccount() { return getAfter(/databases/$(database)/documents/users/$(uid)).data; }
+      function isClawCard() { return entry().roll >= 1000 && entry().roll < 14000; }
+      function isClawSkin() { return entry().roll >= 1000 && entry().roll < 4000; }
+      function cash() {
+        let r = entry().roll;
+        return r >= 14000 && r < 17000 ? 10000
+          : r >= 17000 && r < 30000 ? 2000
+          : r >= 30000 && r < 50000 ? 500 : 0;
+      }
+      function validEntry() {
+        let e = entry();
+        return e.keys().hasOnly(['v','roll','mid','skin','cost','at'])
+          && e.v == 1 && e.cost == 1000 && e.at is int && e.at > 0
+          && e.roll is int && e.roll >= 0 && e.roll < 100000
+          && (isClawCard() ? e.mid in ['reutskaya','tolstikov','otyutskiy','kozhenkov','goncharova','varvarin','zverev','morozova','smolyaninov','znamenshikova'] : e.mid == '')
+          && (isClawSkin() ? e.skin in ['neon','retro','comic'] : e.skin == '');
+      }
+      function validCards() {
+        let b = oldAccount().cards;
+        let a = newAccount().cards;
+        let m = entry().mid;
+        let sk = m + ':' + entry().skin;
+        let chDelta = isClawCard() && (!isClawSkin() || b.ch.get(m,0) == 0) ? 1 : 0;
+        let skDelta = isClawSkin() ? 1 : 0;
+        return a.diff(b).affectedKeys().hasOnly(['ch','sk'])
+          && a.ch.diff(b.ch).affectedKeys().hasOnly([m]) && a.ch.get(m,0) == b.ch.get(m,0) + chDelta
+          && a.sk.diff(b.sk).affectedKeys().hasOnly([sk]) && a.sk.get(sk,0) == b.sk.get(sk,0) + skDelta;
+      }
+      function validStats() {
+        let b = oldAccount().shop.get('claw',{});
+        let a = newAccount().shop.claw;
+        let bt = b.get('titles',{});
+        let at = a.titles;
+        let r = entry().roll;
+        return a.keys().hasOnly(['n','boots','titles','last'])
+          && a.n == b.get('n',0) + 1 && a.last == runId
+          && a.boots == b.get('boots',0) + (r >= 50000 && r < 70000 ? 1 : 0)
+          && at.keys().hasOnly(['hunter','lucky','azart'])
+          && at.hunter == bt.get('hunter',0) + (r >= 100 && r < 1000 ? 1 : 0)
+          && at.lucky == bt.get('lucky',0) + (r >= 1 && r < 100 ? 1 : 0)
+          && at.azart == bt.get('azart',0) + (r == 0 ? 1 : 0);
+      }
+      function validAssets() {
+        let b = oldAccount();
+        let a = newAccount();
+        return a.assetOp == 'claw/' + runId && b.get('assetOp','') != a.assetOp
+          && a.diff(b).affectedKeys().hasOnly(['st','shop','cards','updatedAt','assetOp'])
+          && a.st.diff(b.st).affectedKeys().hasOnly(['sp'])
+          && a.st.sp == b.st.sp - 1000 + cash() && b.st.sp >= 1000 && a.st.sp >= 0
+          && a.shop.diff(b.shop).affectedKeys().hasOnly(['claw'])
+          && validStats() && validCards();
+      }
+      allow read: if signedPlayer() && request.auth.uid == uid;
+      allow create: if signedPlayer() && request.auth.uid == uid
+        && request.time >= timestamp.value(1795294800000)
+        && validEntry() && validAssets();
+      allow update, delete: if false;
     }
     // Сброс пароля (pack40): пароль, зашифрованный кодом восстановления. Без кода прочитать нельзя.
     // Открыть можно один документ по номеру (get), перечислять все — нельзя (list).
@@ -81,13 +156,14 @@ service cloud.firestore {
     match /dkr/{code} {
       allow get, list: if request.auth != null;
       allow create: if request.auth != null
+        && request.time < timestamp.value(1795294800000)
         && request.resource.data.h.uid == request.auth.uid
         && request.resource.data.st == 'wait' && request.resource.data.g == null
         && request.resource.data.stake is int && request.resource.data.stake > 0;
       allow update: if request.auth != null && (
         resource.data.h.uid == request.auth.uid
         || (resource.data.g != null && resource.data.g.uid == request.auth.uid)
-        || (resource.data.st == 'wait' && resource.data.g == null && request.resource.data.g.uid == request.auth.uid));
+        || (request.time < timestamp.value(1795294800000) && resource.data.st == 'wait' && resource.data.g == null && request.resource.data.g.uid == request.auth.uid));
       allow delete: if false;
     }
     // Рейтинг джекпотов и профили: каждый пишет только свою строку.
@@ -100,7 +176,8 @@ service cloud.firestore {
         && request.resource.data.jackpots is number && request.resource.data.jackpots >= 0
         && request.resource.data.spins is number && request.resource.data.spins >= 0
         && (request.resource.data.photo == null || (request.resource.data.photo is string && request.resource.data.photo.size() < 30000))
-        && (!('look' in request.resource.data) || (request.resource.data.look is map && request.resource.data.look.size() <= 4))
+        && (!('look' in request.resource.data) || (request.resource.data.look is map && request.resource.data.look.size() <= 5
+          && (!('t' in request.resource.data.look) || (request.resource.data.look.t is string && request.resource.data.look.t.size() <= 64))))
         && (!('coll' in request.resource.data) || (request.resource.data.coll is map && request.resource.data.coll.size() <= 4));
     }
     // Exchanges use escrow: creation reserves assets, acceptance pays the recipient,

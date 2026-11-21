@@ -11,8 +11,11 @@ name: Android APK
 on:
   push:
     branches: [main]
-    paths: ['android/**', '.github/workflows/android.yml']
+    paths: ['android/**', '.github/workflows/android.yml', '.github/scripts/android-window.py']
   workflow_dispatch:
+  schedule:
+    # 22 November, 00:05 Moscow. The window job ignores later annual ticks.
+    - cron: '5 21 21 11 *'
 
 permissions:
   contents: write
@@ -22,8 +25,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  window:
     runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.check.outputs.build }}
+      publish: ${{ steps.check.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: python3 .github/scripts/android-window.py
+
+  build:
+    needs: window
+    if: needs.window.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -63,7 +79,15 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
         run: gradle assembleRelease --no-daemon --stacktrace
 
+      - name: Сохранить проверенную сборку
+        uses: actions/upload-artifact@v4
+        with:
+          name: Summa-Lichnostey-${{ github.run_number }}
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
+
       - name: Релиз и копия в ветку apk-build
+        if: needs.window.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           N: ${{ github.run_number }}
