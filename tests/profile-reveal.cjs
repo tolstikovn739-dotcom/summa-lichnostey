@@ -5,7 +5,7 @@ const ctx={CA62:r,caOutcome61:()=>({title:'azart'}),caBoard62(){},caAimControls6
 ctx.caReserveControls68(r);assert.equal(bottom.style.minHeight,'154px');assert.equal(r.controlHeight68,154);assert.equal(reserved,1);const markup=ctx.caRevealMarkup64(r.active.entry);assert(markup.includes('--ci-start-x68:'));assert(markup.includes('--ci-start-y68:'));assert(!markup.includes('NaN'));
 r.phase='opening';ctx.caFinish64(r);assert.equal(bottom.style.minHeight,'154px','Result changed reserved panel height');assert.equal(ctx.CA62,r);assert.equal(r.phase,'result');assert(bottom.innerHTML.includes('Надеть титул'));ctx.caFinish64(r);assert.equal(clears,1,'Repeated finish cleared twice');
 assert(html.includes('#sxOv.pc-settings,#spPfOv.pf63{padding-top:calc(env(safe-area-inset-top,0px) + 14px)!important;'));
-assert(html.includes('position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px)'));assert(html.includes('width:44px!important;height:44px!important;min-width:44px'));
+assert(html.includes('position:static!important;top:auto!important;inset:auto!important;flex:0 0 auto!important'));assert(html.includes('overflow-y:auto;-webkit-overflow-scrolling:touch'));assert(html.includes('width:44px!important;height:44px!important;min-width:44px'));
 assert(html.includes(".id==='azart'?4600:2750"));assert(html.includes('src="assets/app-icon-192.png?v=68"'));assert(html.includes('href="assets/apple-touch-icon.png?v=68"'));
 for(const inset of [0,20,47,59]){const stickyButtonTop=inset+8+7;assert(stickyButtonTop>=inset+8)}
 console.log('Profile/reveal passed: safe-area selectors, reachable 44px close, fixed footer height, one result, slot-origin animation, new icon references.');

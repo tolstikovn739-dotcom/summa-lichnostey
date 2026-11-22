@@ -7639,6 +7639,22 @@ caFinish64=function(r){if(CA62!==r||r.phase!=='opening'||r.revealDone64)return;r
 </script>
 
 
+<style id="pack69">
+/* Header and scrolling content are siblings: no sticky offsets or overlap. */
+#sxOv.pc-settings,#spPfOv.pf63{display:flex!important;align-items:flex-start!important;justify-content:center;overflow:hidden!important;padding:calc(env(safe-area-inset-top,0px) + 10px) 10px calc(env(safe-area-inset-bottom,0px) + 12px)!important}
+#sxOv.pc-settings>.pe-box.profile-shell69,#spPfOv.pf63>.pe-box.profile-shell69{display:flex!important;flex-direction:column;gap:0!important;padding:0!important;margin:0 auto!important;min-height:0;max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 22px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 22px);overflow:hidden!important;animation:none!important;transform:none!important}
+#sxOv.pc-settings>.pe-box>.profile-bar69,#spPfOv.pf63>.pe-box>.profile-bar69{position:static!important;top:auto!important;inset:auto!important;flex:0 0 auto!important;align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;margin:0!important;padding:10px 18px!important;border-radius:0!important;border-bottom:1px solid #b3cbe333;background:#24447a;z-index:auto;transform:none!important}
+#sxOv.pc-settings>.pe-box>.profile-scroll69,#spPfOv.pf63>.pe-box>.profile-scroll69{position:relative;flex:1 1 auto;min-height:0;min-width:0;max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 88px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 88px);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 18px 20px;scroll-padding-top:12px}
+#sxOv .profile-scroll69>.sx-hero{margin-top:0}.profile-scroll69:focus{outline:none}.profile-scroll69>.pc-nav{margin-top:0}.profile-bar69 h3{flex:1;min-width:0;overflow-wrap:anywhere}
+@media(max-width:360px){#sxOv.pc-settings>.pe-box>.profile-bar69,#spPfOv.pf63>.pe-box>.profile-bar69{padding-left:14px!important;padding-right:14px!important}#sxOv.pc-settings>.pe-box>.profile-scroll69,#spPfOv.pf63>.pe-box>.profile-scroll69{padding-left:14px;padding-right:14px}}
+</style>
+<script id="pack69js">
+function profileShell69(ov){const box=ov?.querySelector('.pe-box');if(!box)return;let head=[...box.children].find(el=>el.classList.contains('sx-head'));if(!head)return;let body=[...box.children].find(el=>el.classList.contains('profile-scroll69'));if(!body){body=document.createElement('div');body.className='profile-scroll69';body.setAttribute('role','region');body.setAttribute('aria-label','Содержимое профиля');body.tabIndex=0}head.classList.add('profile-bar69');box.classList.add('profile-shell69');for(const el of [...box.children])if(el!==head&&el!==body)body.appendChild(el);box.insertBefore(head,box.firstChild);if(body.parentElement!==box)box.appendChild(body);ov.scrollTop=0}
+const settings69=openSettings;openSettings=function(...args){const previous=$('sxOv')?.querySelector('.profile-scroll69')?.scrollTop||0;settings69(...args);const ov=$('sxOv');profileShell69(ov);const body=ov?.querySelector('.profile-scroll69');if(body)body.scrollTop=previous};
+const publicProfile69=spOpenProfile;spOpenProfile=async function(...args){const pending=publicProfile69(...args),ov=$('spPfOv');profileShell69(ov);await pending;if(ov?.isConnected&&$('spPfOv')===ov)profileShell69(ov)};
+</script>
+
+
 </body>
 
  

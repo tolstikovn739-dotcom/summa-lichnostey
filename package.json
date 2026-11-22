@@ -6,7 +6,8 @@
     "test:claw": "firebase emulators:exec --only firestore --project demo-claw \"node tests/claw-rules.cjs\"",
     "test:ranking": "firebase emulators:exec --only firestore --project demo-rift-ranking \"node tests/rift-ranking.cjs\"",
     "test:motion": "node tests/claw-motion.cjs",
-    "test:profile-reveal": "node tests/profile-reveal.cjs"
+    "test:profile-reveal": "node tests/profile-reveal.cjs",
+    "test:profile-layout": "node tests/profile-layout.cjs"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "4.0.1",
