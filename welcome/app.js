@@ -2,103 +2,59 @@
   'use strict';
   const TEAM=[{"id":"tolstikov","name":"Толстиков Николай","shortName":"Николай Т.","role":"ЭКОНОМИКА","slogan":"Идеи • Планы • Результат. Экономический расчёт и ресурсы команды."},{"id":"reutskaya","name":"Реутская Екатерина","shortName":"Екатерина Р.","role":"УПРАВЛЕНИЕ","slogan":"Команда • Люди • Управление. Координация штаба и лидерство."},{"id":"smolyaninov","name":"Смольянинов Артем","shortName":"Артем С.","role":"Безопасность","slogan":"Надёжность, уверенность и защита интересов команды."},{"id":"varvarin","name":"Варварин Никита","shortName":"Никита В.","role":"Спорт","slogan":"Спортивный драйв, энергия движения и воля к победе."},{"id":"kozhenkov","name":"Коженков Арсений","shortName":"Арсений К.","role":"ПАТРИОТ","slogan":"Честь, дисциплина, выдержка и верность традициям."},{"id":"goncharova","name":"Гончарова Елизавета","shortName":"Елизавета Г.","role":"Медиа","slogan":"Стиль, кадры и главный медиа-голос «Суммы Личностей»."},{"id":"morozova","name":"Морозова Ульяна","shortName":"Ульяна М.","role":"Культура","slogan":"Творчество, эстетика и культурный код фестиваля."},{"id":"otyutskiy","name":"Отюцкий Евгений","shortName":"Евгений О.","role":"ПОЛИТИК","slogan":"Сила в команде! Большие цели начинаются с людей."},{"id":"zverev","name":"Зверев Никита","shortName":"Никита З.","role":"ПРОЕКТИРОВЩИК","slogan":"Превращаем смелые идеи в работающие проекты."},{"id":"znamenshikova","name":"Знаменщикова Кристина","shortName":"Кристина З.","role":"Журналист","slogan":"Острые репортажи, смыслы и летопись наших побед."}];
   const mainSite='https://tolstikovn739-dotcom.github.io/summa-lichnostey/';
-  const $=function(selector,root){return (root||document).querySelector(selector);};
-  const $$=function(selector,root){return Array.from((root||document).querySelectorAll(selector));};
+  const $=(selector,root)=>(root||document).querySelector(selector);
+  const $$=(selector,root)=>Array.from((root||document).querySelectorAll(selector));
   const motion=window.SummaMotion;
   const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile=window.matchMedia('(max-width: 900px)');
-  const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
-  const header=$('#site-header');
-  const menu=$('#mobile-menu');
-  const menuToggle=$('#menu-toggle');
-
-  function setMenu(open){
-    menu.hidden=!open;
-    menuToggle.setAttribute('aria-expanded',String(open));
-    menuToggle.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
-    header.classList.toggle('menu-open',open);
-  }
-  menuToggle.addEventListener('click',function(){setMenu(menu.hidden);});
-  $$('a',menu).forEach(function(link){link.addEventListener('click',function(){setMenu(false);});});
-  document.addEventListener('keydown',function(event){
-    if(event.key==='Escape'&&!menu.hidden){setMenu(false);menuToggle.focus();}
-  });
-  document.addEventListener('click',function(event){if(!header.contains(event.target)&&!menu.hidden)setMenu(false);});
-
+  const header=$('#site-header'),menu=$('#mobile-menu'),menuToggle=$('#menu-toggle');
+  const frame=$('#native-app'),device=$('#app-device'),viewport=$('#device-viewport'),scene=$('#scene-pin'),track=$('#top');
   const featureTabs=$$('#feature-tabs [role=tab]');
-  const panels=$$('.demo-panel');
-  let activeScreen='feed';
-  let manualScreen=false;
-  const captions={feed:'Всё, что важно для твоего круга',cards:'Личности, которые всегда рядом',profile:'Твой профиль. Твой характер.'};
-  $('.demo-area').addEventListener('focusin',function(){manualScreen=true;});
-  function selectScreen(screen,manual){
-    if(!captions[screen])return;
+  let activeScreen='feed',manualScreen=false,playing=false,appReady=false;
+  frame.tabIndex=-1;
+  const scenes={
+    feed:{title:'БУДЬ В ЦЕНТРЕ<br>СОБЫТИЙ.',description:'Листай посты, ставь лайки, голосуй и оставляй комментарии. Так же, как в приложении.'},
+    cards:{title:'ТВОИ ЛЮДИ.<br>ТВОЯ КОЛЛЕКЦИЯ.',description:'Настоящий альбом команды: персонажи, образы, фильтры и просмотр карточек. Нажми «Попробовать» и рассмотри их поближе.'},
+    profile:{title:'У КАЖДОГО<br>СВОЙ ХАРАКТЕР.',description:'Титул, золотое имя, значок и коллекция — в настоящем профиле приложения. Переключай вкладки и смотри карточки и посты.'}
+  };
+  function setMenu(open){menu.hidden=!open;menuToggle.setAttribute('aria-expanded',String(open));menuToggle.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');header.classList.toggle('menu-open',open);}
+  menuToggle.addEventListener('click',()=>setMenu(menu.hidden));
+  $$('a',menu).forEach(link=>link.addEventListener('click',()=>setMenu(false)));
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidden){setMenu(false);menuToggle.focus();}if(event.key==='Escape'&&playing)setPlaying(false);});
+  document.addEventListener('click',event=>{if(!header.contains(event.target)&&!menu.hidden)setMenu(false);});
+  function sendScreen(){if(appReady)frame.contentWindow?.postMessage({type:'summa:show',screen:activeScreen},location.origin);}
+  function selectScreen(screen,manual,fromFrame){
+    if(!scenes[screen])return;
     if(manual)manualScreen=true;
-    if(activeScreen===screen)return;
+    const changed=activeScreen!==screen;
     activeScreen=screen;
-    featureTabs.forEach(function(tab){
-      const active=tab.dataset.screen===screen;
-      tab.setAttribute('aria-selected',String(active));
-      tab.tabIndex=active?0:-1;
-    });
-    panels.forEach(function(panel){
-      const active=panel.id==='panel-'+screen;
-      panel.classList.toggle('is-active',active);
-      panel.setAttribute('aria-hidden',String(!active));
-      panel.inert=!active;
-    });
-    $('#screen-caption').textContent=captions[screen];
+    featureTabs.forEach(tab=>{const active=tab.dataset.screen===screen;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
+    if(changed){$('#scene-heading').innerHTML=scenes[screen].title;$('#scene-description').textContent=scenes[screen].description;
+      if(!reduceMotion.matches&&$('#scene-heading').animate)$('#scene-heading').animate([{opacity:.2,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:550,easing:'cubic-bezier(.22,1,.36,1)'});
+    }
+    if(!fromFrame&&(changed||manual))sendScreen();
   }
-  featureTabs.forEach(function(tab,index){
-    tab.addEventListener('click',function(){selectScreen(tab.dataset.screen,true);});
-    tab.addEventListener('keydown',function(event){
+  featureTabs.forEach((tab,index)=>{
+    tab.setAttribute('aria-controls','native-app');
+    tab.addEventListener('click',()=>selectScreen(tab.dataset.screen,true));
+    tab.addEventListener('keydown',event=>{
       let next=index;
-      if(['ArrowRight','ArrowDown'].includes(event.key))next=(index+1)%featureTabs.length;
-      else if(['ArrowLeft','ArrowUp'].includes(event.key))next=(index+featureTabs.length-1)%featureTabs.length;
+      if(['ArrowRight','ArrowDown'].includes(event.key))next=(index+1)%3;
+      else if(['ArrowLeft','ArrowUp'].includes(event.key))next=(index+2)%3;
       else if(event.key==='Home')next=0;
-      else if(event.key==='End')next=featureTabs.length-1;
+      else if(event.key==='End')next=2;
       else return;
-      event.preventDefault();
-      selectScreen(featureTabs[next].dataset.screen,true);
-      featureTabs[next].focus();
+      event.preventDefault();selectScreen(featureTabs[next].dataset.screen,true);featureTabs[next].focus();
     });
   });
-  function setTabOrientation(){
-    $('#feature-tabs').setAttribute('aria-orientation',mobile.matches?'horizontal':'vertical');
-    if(!mobile.matches)setMenu(false);
-    requestScrollFrame();
-  }
-  mobile.addEventListener('change',setTabOrientation);
-
-  const like=$('.like-button');
-  like.addEventListener('click',function(){
-    const active=like.getAttribute('aria-pressed')!=='true';
-    like.setAttribute('aria-pressed',String(active));
-    $('.like-count',like).textContent=active?'25':'24';
-    manualScreen=true;
-  });
-  $$('[data-feed-filter]').forEach(function(button){
-    button.addEventListener('click',function(){
-      $$('[data-feed-filter]').forEach(function(filter){const on=filter===button;filter.classList.toggle('active',on);filter.setAttribute('aria-pressed',String(on));});
-      $('#text-post').hidden=button.dataset.feedFilter==='photos';
-      manualScreen=true;
-    });
-  });
-  $('#gold-toggle').addEventListener('click',function(event){
-    const button=event.currentTarget;
-    const active=button.getAttribute('aria-pressed')!=='true';
-    button.setAttribute('aria-pressed',String(active));
-    $('#demo-profile-name').classList.toggle('gold-name',active);
-    manualScreen=true;
-  });
-  $('#title-toggle').addEventListener('click',function(event){
-    const button=event.currentTarget;
-    const active=button.getAttribute('aria-pressed')!=='true';
-    button.setAttribute('aria-pressed',String(active));
-    $('#demo-title').hidden=!active;
-    $('#demo-no-title').hidden=active;
-    button.textContent=active?'Снять':'Надеть';
-    manualScreen=true;
+  function setPlaying(active){frame.tabIndex=active?0:-1;playing=active;device.classList.toggle('is-playing',active);$('#stop-app').hidden=!active;manualScreen=active;if(!active)requestScrollFrame();}
+  $('#try-app').addEventListener('click',()=>setPlaying(true));
+  $('#stop-app').addEventListener('click',()=>{setPlaying(false);$('#try-app').focus({preventScroll:true});});
+  frame.addEventListener('load',()=>{if(!appReady){appReady=true;sendScreen();}});
+  window.addEventListener('message',event=>{
+    if(event.source!==frame.contentWindow||event.origin!==location.origin)return;
+    if(event.data?.type==='summa:ready'){appReady=true;sendScreen();}
+    if(event.data?.type==='summa:screen'&&scenes[event.data.screen])selectScreen(event.data.screen,event.data.user===true,true);
   });
 
   const fan=$('#card-fan');
@@ -106,15 +62,12 @@
     button.addEventListener('click',function(){
       $$('.skin-selector button').forEach(function(item){const on=item===button;item.classList.toggle('active',on);item.setAttribute('aria-pressed',String(on));});
       fan.dataset.style=button.dataset.skin;
-      $$('.collectible',fan).forEach(function(card){card.dataset.skin=button.dataset.skin;});
+      $$('.collectible',fan).forEach(function(card){card.dataset.skin=button.dataset.skin;card.innerHTML=window.SummaCards.render(card.dataset.member,button.dataset.skin,{fill:true});});
     });
   });
 
   function safe(value){return String(value).replace(/[&<>"']/g,function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];});}
-  function cardMarkup(member,skin){
-    const firstName=member.name.split(' ').slice(1).join(' ');
-    return '<div class="collectible" data-skin="'+safe(skin)+'"><img src="./assets/'+safe(member.id)+'.webp" width="300" height="410" alt="'+safe(member.name)+'"><span class="card-sigma">Σ</span><span class="card-star">✦</span><span class="card-content"><b>'+safe(firstName)+'</b><small>'+safe(member.role)+'</small></span></div>';
-  }
+  function cardMarkup(member,skin){return '<div class="collectible native-card">'+window.SummaCards.render(member.id,skin||'classic',{fill:true})+'</div>';}
   const dialog=$('#detail-dialog');
   function closeDetail(){dialog.close();}
   function openDetail(memberId,kind,skin){
@@ -220,47 +173,56 @@
   window.addEventListener('resize',updateCarousel,{passive:true});
   requestAnimationFrame(updateCarousel);
 
+
+
+
   let framePending=false;
-  const heroStage=$('#hero-stage');
-  const inside=$('#inside');
-  let pointerX=0;
+  function fitApp(){
+    const width=viewport.clientWidth,height=viewport.clientHeight;
+    if(!width||!height)return;
+    const scale=width/390;
+    frame.style.width='390px';frame.style.height=Math.ceil(height/scale)+'px';
+    frame.style.setProperty('--app-scale',scale.toFixed(5));
+  }
   function updateScroll(){
     framePending=false;
     header.classList.toggle('is-scrolled',window.scrollY>16);
-    if(document.hidden||reduceMotion.matches)return;
-    const height=window.innerHeight;
-    const heroRect=heroStage.getBoundingClientRect();
-    if(heroRect.bottom>0&&heroRect.top<height){
-      heroStage.style.setProperty('--hero-p',motion.clamp((height-heroRect.top)/(height+heroRect.height),0,1).toFixed(3));
-      heroStage.style.setProperty('--pointer-x',pointerX.toFixed(3));
-    }
-    if(!mobile.matches&&height>760){
-      const rect=inside.getBoundingClientRect();
-      const progress=motion.clamp((82-rect.top)/Math.max(1,rect.height-height+82),0,1);
-      if(progress===0||progress===1)manualScreen=false;
-      if(!manualScreen&&rect.top<height&&rect.bottom>82)selectScreen(motion.screenForProgress(progress),false);
-    }
+    if(document.hidden)return;
+    const height=scene.clientHeight||window.innerHeight;
+    const width=window.innerWidth;
+    const rect=track.getBoundingClientRect();
+    const progress=motion.clamp(-rect.top/Math.max(1,rect.height-height),0,1);
+    if(rect.bottom<0||rect.top>height){if(!playing)manualScreen=false;return;}
+    const pose=motion.scenePose(progress,reduceMotion.matches);
+    const headerBottom=header.getBoundingClientRect().bottom;
+    const targetTop=headerBottom+(mobile.matches?12:18);
+    const travel=Math.max(0,height-48-targetTop);
+    scene.style.setProperty('--scene-progress',progress.toFixed(4));
+    scene.style.setProperty('--title-opacity',pose.title.toFixed(4));
+    scene.style.setProperty('--title-lift',(pose.enter*66).toFixed(2)+'px');
+    scene.style.setProperty('--title-scale',reduceMotion.matches?'1':(1-pose.enter*.06).toFixed(4));
+    scene.style.setProperty('--detail-opacity',pose.detail.toFixed(4));
+    scene.style.setProperty('--device-lift',(-travel*pose.enter).toFixed(2)+'px');
+    scene.style.setProperty('--device-tilt',pose.tilt.toFixed(2)+'deg');
+    scene.style.setProperty('--device-roll',pose.roll.toFixed(2)+'deg');
+    scene.style.setProperty('--device-scale',pose.scale.toFixed(4));
+    scene.style.setProperty('--device-drift',(mobile.matches?0:Math.min(width*.17,270)*pose.enter).toFixed(2)+'px');
+    scene.classList.toggle('is-revealed',pose.detail>.85);device.inert=pose.detail<=.85;
+    if((progress<.02||progress>.99)&&!playing)manualScreen=false;
+    if(!manualScreen&&!playing)selectScreen(motion.screenForScene(progress),false);
+    // Freeze focus in an active demo; the page never captures wheel/touch scrolling.
   }
   function requestScrollFrame(){if(!framePending){framePending=true;requestAnimationFrame(updateScroll);}}
+  function resizeScene(){if(!mobile.matches)setMenu(false);fitApp();requestScrollFrame();}
   window.addEventListener('scroll',requestScrollFrame,{passive:true});
-  window.addEventListener('resize',requestScrollFrame,{passive:true});
+  window.addEventListener('resize',resizeScene,{passive:true});
   document.addEventListener('visibilitychange',requestScrollFrame);
+  mobile.addEventListener('change',resizeScene);
   reduceMotion.addEventListener('change',requestScrollFrame);
-  heroStage.addEventListener('pointermove',function(event){
-    if(!finePointer.matches||reduceMotion.matches)return;
-    const rect=heroStage.getBoundingClientRect();
-    pointerX=motion.clamp((event.clientX-rect.left)/rect.width*2-1,-1,1);
-    requestScrollFrame();
-  },{passive:true});
-  heroStage.addEventListener('pointerleave',function(){pointerX=0;requestScrollFrame();});
-
-  if('IntersectionObserver' in window){
-    const observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}});},{threshold:.08,rootMargin:'0px 0px -16px 0px'});
-    $$('.reveal').forEach(function(element){observer.observe(element);});
-    document.documentElement.classList.add('js');
-    const marqueeObserver=new IntersectionObserver(function(entries){$('.running-track').style.animationPlayState=entries[0].isIntersecting?'running':'paused';});
-    marqueeObserver.observe($('.running-line'));
+  if('ResizeObserver'in window){const observer=new ResizeObserver(fitApp);observer.observe(viewport);}
+  if('IntersectionObserver'in window){
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}}),{threshold:.08,rootMargin:'0px 0px -16px 0px'});
+    $$('.reveal').forEach(element=>observer.observe(element));document.documentElement.classList.add('js');
   }
-  setTabOrientation();
-  requestScrollFrame();
+  resizeScene();
 })();

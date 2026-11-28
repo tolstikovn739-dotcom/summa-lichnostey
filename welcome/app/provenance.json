@@ -1,0 +1,227 @@
+{
+  "source": "index.html",
+  "sourceSHA256": "df16c005e1e41baf6bbaa9fc60f6571daf54a5d6f487cebfc7724f4f4e9e3373",
+  "declarations": [
+    {
+      "name": "CC_GIRLS",
+      "pack": "pack28js",
+      "sha256": "e68b38528a2e1af403018e92a6cfb5084d01015f521f4168b9a6e97f19e1d383"
+    },
+    {
+      "name": "CC_SVG",
+      "pack": "pack28js",
+      "sha256": "5707e34663f7cbea980cbfc18df83dd4db354da4c88335843b9d081b1edaf4ca"
+    },
+    {
+      "name": "ccMem",
+      "pack": "pack28js",
+      "sha256": "c47a99b3bdc790aba438c3313110b75bc665fc42b4c666610cbe99b8b556287a"
+    },
+    {
+      "name": "ccPhoto",
+      "pack": "pack28js",
+      "sha256": "c525499a6884c2cd5426e31d8b03320eff5a86ec82ba85081676ced7b31b9a09"
+    },
+    {
+      "name": "ccFirst",
+      "pack": "pack28js",
+      "sha256": "cf7d96af211219e64d35e54e5e7fc8af0d926e1458b4b4170b14686159e50215"
+    },
+    {
+      "name": "C2_SKINS",
+      "pack": "pack29js",
+      "sha256": "17e5f002cc65aecdd734ebdf20f82bdeb1def446eb13eae7ff8420667c757241"
+    },
+    {
+      "name": "C2_R",
+      "pack": "pack29js",
+      "sha256": "9af2abf6c2eef57226a8465296c27c00ff1b92476064df3fe0288b052089cffa"
+    },
+    {
+      "name": "C2_SVG",
+      "pack": "pack29js",
+      "sha256": "34f7ae62d3ca4145d8e965b30867f0e152ce42279427db5202460099d6caac3c"
+    },
+    {
+      "name": "c2N",
+      "pack": "pack29js",
+      "sha256": "879464388ccbd43f15fd671250d327659162b7ea6556933129d517ef9598c381"
+    },
+    {
+      "name": "c2HasCh",
+      "pack": "pack29js",
+      "sha256": "fce90037cbf94ec92188d69f3e5d82e63cb452a99869641d906bf8abf130ef82"
+    },
+    {
+      "name": "c2HasSk",
+      "pack": "pack29js",
+      "sha256": "4deefd5d7353effa384ed16d453fcc72516686219aa8d4a9a8b52a4ec8184c1a"
+    },
+    {
+      "name": "c2Sk",
+      "pack": "pack29js",
+      "sha256": "300b11f440abb2ca0cfcddd5fb369992dbaf01530340fe0e9c8b2db7437e04aa"
+    },
+    {
+      "name": "c2Title",
+      "pack": "pack29js",
+      "sha256": "aa5cedc7b9f5637df39cd364b640bcc501d3a131f215afdb458cc209e51ee82f"
+    },
+    {
+      "name": "c2Card",
+      "pack": "pack29js",
+      "sha256": "3c900471867b93d2688e86f71e4f5448dfddf79020a27f0b7676bbd805e4eef1"
+    },
+    {
+      "name": "esc",
+      "pack": "pack2js",
+      "sha256": "c343030f4d04869aa59463acea97ef59ab9b16928729531dead6b24f5ab05117"
+    },
+    {
+      "name": "xText",
+      "pack": "pack2js",
+      "sha256": "3861b4254e7a86ce3feea146902cb3045755b4e19353fe372ebf6fbd58fb3608"
+    },
+    {
+      "name": "fmt",
+      "pack": "pack2js",
+      "sha256": "4adb0368f686a7df508e938369ecace056dcbdf1bb18e199ccb767d631ab32f0"
+    },
+    {
+      "name": "IC",
+      "pack": "pack2js",
+      "sha256": "7f64770d67b84ac20192936c56e6f52561989ae650878bc1f7803fc537b3aa61"
+    },
+    {
+      "name": "HANDLES",
+      "pack": "pack2js",
+      "sha256": "43bba888de8c9f89d7c4e6360f638da9ed740d3fe8f0dd8163fe4fcd99ee0abe"
+    },
+    {
+      "name": "mediaHTML",
+      "pack": "pack2js",
+      "sha256": "1f08ddd47cb45405a4bdd4f62ae1e71922f54dd5826dc3f3fced91099f70b39f"
+    },
+    {
+      "name": "pollHTML",
+      "pack": "pack2js",
+      "sha256": "ee6c1ed673f7301ae1e0744298fd7637cc3ec7df76bc2529d45cf37ed80d641a"
+    },
+    {
+      "name": "renderNewsFeed",
+      "pack": "pack2js",
+      "sha256": "cb2ff7dc63317336407e34d1d70bbc1d233ca54d161ec83ef2d1e7e4f65b675f"
+    },
+    {
+      "name": "setFeedTab",
+      "pack": "pack2js",
+      "sha256": "426c260a243f08f8a2a48eec5cd12eaa384a19da9f40cb09c9921d5b72f60139"
+    },
+    {
+      "name": "toggleRepost",
+      "pack": "pack2js",
+      "sha256": "af0af54af22a80f1b24560c18557815ec147b2f81e0283087d98f31866ab2391"
+    },
+    {
+      "name": "votePoll",
+      "pack": "pack2js",
+      "sha256": "68b8f35c71399677022b393d461fbb4f76c6f56d86efdaa928c56241d3c31b5e"
+    },
+    {
+      "name": "togglePostLike",
+      "pack": "base",
+      "sha256": "817719ced9f261b5cbe892fd1687cce62b8e00ea192ef8212eb2b9833d2802ad"
+    },
+    {
+      "name": "openFullPostModal",
+      "pack": "base",
+      "sha256": "0276d4b34afe65684ef6ad524f0896872ed2d94ede789f295b5d62b83cf55385"
+    },
+    {
+      "name": "renderFullPostModalContent",
+      "pack": "base",
+      "sha256": "a7df7a39b54c2ed2f7ead4a9b0aa0e95f45e50226373b142192c8453e1463f90"
+    },
+    {
+      "name": "closeFullPostModal",
+      "pack": "base",
+      "sha256": "35d1d612fe3e938f51a88fdbd7270d94357c40730d706911ef57261f7e0c20fe"
+    },
+    {
+      "name": "handleAddComment",
+      "pack": "base",
+      "sha256": "16bd5e30ad495d8860266ca36b9f62768dcac7ad7d079210838f3c955572721b"
+    },
+    {
+      "name": "c2Count",
+      "pack": "pack29js",
+      "sha256": "e7ed234059afe29d6d0a5d59d2e203b72bc452103899676cd97d3f7ee0e92245"
+    },
+    {
+      "name": "ccOpenAlbum",
+      "pack": "pack28js",
+      "sha256": "b695d199a8dc5dfc40091117236c46ee7e994fda6f9fa16204440006ab66ba4e"
+    },
+    {
+      "name": "ccAlbRender",
+      "pack": "pack28js",
+      "sha256": "3a6fd5a6b9fa1fd9c7d61d98bcb5296d25d9b59ad8035edc6c59e2c95e29b8f0"
+    },
+    {
+      "name": "c2View",
+      "pack": "pack29js",
+      "sha256": "9ebdeb375b85d382ea6e866131349171241b7e3abdb6465130a193d551b70e06"
+    },
+    {
+      "name": "C2_TOTAL",
+      "pack": "pack29js",
+      "sha256": "955a687cde90d665cd3380fb0ef658dc07c7eacda89b7a91c7b9e33d09f61f60"
+    },
+    {
+      "name": "C2_CH_DUP",
+      "pack": "pack29js",
+      "sha256": "bc40ff53c74bd99fc195b72a3a76183389585f7ede51a31ad643cb32e1a09ca9"
+    },
+    {
+      "name": "ccAlbHTML",
+      "pack": "pack29js",
+      "sha256": "58b809d7d9232a6aa58eddc6860cc6f5dd5f2c609dc260f36738b340a933a546"
+    },
+    {
+      "name": "pfCardKeys63",
+      "pack": "pack63js",
+      "sha256": "e7b7a4e0c111d50909a628bd3c319dfcb3f90738016c1ff77531db59c63dcb93"
+    },
+    {
+      "name": "pfTab63",
+      "pack": "pack63js",
+      "sha256": "723b1348e9acb100f0f89dc72a4951d80eec5747a3d4f2082cec4d052693f96f"
+    },
+    {
+      "name": "pfBigCard63",
+      "pack": "pack63js",
+      "sha256": "4c974b20653f5529a089fd795b01ae58b303f61def7de1fc9b5c17e383450d5b"
+    },
+    {
+      "name": "pfMoreCards63",
+      "pack": "pack63js",
+      "sha256": "de2e92ae8e5573e670983cc5cd5e0b63a2225750b4b48bccbccfec6856b223a0"
+    },
+    {
+      "name": "spOpenProfile",
+      "pack": "pack63js",
+      "sha256": "ce4105ffab3ad61279be46641394efb171ff9282799ad7f09869624700e6c78e"
+    },
+    {
+      "name": "pcBadge61",
+      "pack": "pack61js",
+      "sha256": "4512afc505a6def921a16cdb3b43269c0da4130f478fc77add7644f79a09c8bf"
+    },
+    {
+      "name": "profileShell69",
+      "pack": "pack69js",
+      "sha256": "abd63a485fea3c89b41685099612444997378b4cb6746119d315b378960163d4"
+    }
+  ],
+  "scope": "Native feed, card art and profile renderers; local example data. No application bootstraps or financial/game actions."
+}
